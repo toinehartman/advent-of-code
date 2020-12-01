@@ -1,4 +1,4 @@
-# aoc-template
+# aoc
 
 This is an (opinionated) Advent of Code template for solutions in Haskell.
 
