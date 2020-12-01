@@ -21,18 +21,24 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = decimal `sepBy` endOfLine
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Int]
 
-type OutputA = Void
+type OutputA = Int
 
 type OutputB = Void
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA nums = case find (\(x, y) -> x + y == 2020) $ createPairs nums of
+  Just (n, m) -> n * m
+  _ -> error "No pair sums to 2020"
+
+createPairs :: [a] -> [(a, a)]
+createPairs [] = []
+createPairs (x : xs) = map ((,) x) xs ++ createPairs xs
 
 ------------ PART B ------------
 partB :: Input -> OutputB
