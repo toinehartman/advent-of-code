@@ -28,18 +28,16 @@ type Input = [Int]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA nums = case find (\(x, y) -> x + y == 2020) $ createPairs nums of
-  Just (n, m) -> n * m
-  _ -> error "No pair sums to 2020"
+partA = product . sumsTo 2020 . U.sublistsOfSize 2
 
-createPairs :: [a] -> [(a, a)]
-createPairs [] = []
-createPairs (x : xs) = map ((,) x) xs ++ createPairs xs
+sumsTo :: (Num a, Eq a) => a -> [[a]] -> [a]
+sumsTo n xs = case find (\ys -> sum ys == n) xs of
+  Just zs -> zs
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = product . sumsTo 2020 . U.sublistsOfSize 3

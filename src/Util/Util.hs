@@ -40,3 +40,12 @@ chunksOf n ls
   | n <= 0 = error "Cannot split into chunks of negative length."
   | length ls < n = [ls]
   | otherwise = (take n ls) : (chunksOf n (drop n ls))
+
+--- Creates sublists of size x
+sublistsOfSize :: Int -> [a] -> [[a]]
+sublistsOfSize 0 _ = [[]]
+sublistsOfSize _ [] = []
+sublistsOfSize n l@(x : xs) = withHead ++ withoutHead
+  where
+    withHead = map (x :) $ sublistsOfSize (n - 1) xs
+    withoutHead = sublistsOfSize n xs
