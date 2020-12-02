@@ -15,7 +15,7 @@ import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
 import Data.Char (isAlpha, isSpace)
-import Data.Text (Text, count, singleton)
+import Data.Text (Text, count, index, singleton)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -49,7 +49,7 @@ type Input = [PasswordCombo]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 -- Custom types
 data PasswordCombo = PasswordCombo Policy Password deriving (Show)
@@ -58,17 +58,22 @@ type Password = Text
 
 data Policy = Policy Int Int Char deriving (Show)
 
-isValid :: PasswordCombo -> Bool
-isValid (PasswordCombo (Policy min max c) pass) = n >= min && n <= max
+isValidA :: PasswordCombo -> Bool
+isValidA (PasswordCombo (Policy min max c) pass) = n >= min && n <= max
   where
     n = Data.Text.count (singleton c) pass
 
 count' :: (a -> Bool) -> [a] -> Int
 count' p = length . filter p
+xor' :: Bool -> Bool -> Bool
+xor' True b = not b
+xor' False b = b
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = count' isValid
+partA = count' isValidA
 
 ------------ PART B ------------
+isValidB :: PasswordCombo -> Bool
+isValidB (PasswordCombo (Policy p1 p2 c) pass) = xor' ((pass `index` (p1 - 1)) == c) ((pass `index` (p2 - 1)) == c)
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = count' isValidB
