@@ -14,6 +14,8 @@ import qualified Util.Util as U
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
+import Data.Char (isAlpha, isSpace)
+import Data.Text (Text, count, singleton)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,18 +23,51 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = passwordCombo `sepBy` endOfLine
 
+passwordCombo :: Parser PasswordCombo
+passwordCombo = do
+  pol <- policy
+  skip (== ':')
+  skip isSpace
+  pass <- password
+  return $ PasswordCombo pol pass
+
+password :: Parser Password
+password = Data.Attoparsec.Text.takeWhile isAlpha
+
+policy :: Parser Policy
+policy = do
+  lower <- decimal
+  skip (== '-')
+  upper <- decimal
+  skip isSpace
+  c <- anyChar
+  return $ Policy lower upper c
 ------------ TYPES ------------
-type Input = Void
+type Input = [PasswordCombo]
 
-type OutputA = Void
+type OutputA = Int
 
 type OutputB = Void
 
+-- Custom types
+data PasswordCombo = PasswordCombo Policy Password deriving (Show)
+
+type Password = Text
+
+data Policy = Policy Int Int Char deriving (Show)
+
+isValid :: PasswordCombo -> Bool
+isValid (PasswordCombo (Policy min max c) pass) = n >= min && n <= max
+  where
+    n = Data.Text.count (singleton c) pass
+
+count' :: (a -> Bool) -> [a] -> Int
+count' p = length . filter p
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = count' isValid
 
 ------------ PART B ------------
 partB :: Input -> OutputB
