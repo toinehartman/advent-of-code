@@ -50,6 +50,7 @@ library
       Days.Day24
       Days.Day25
       Program.RunDay
+      Program.Time
       Util.Parsers
       Util.Util
   other-modules:
