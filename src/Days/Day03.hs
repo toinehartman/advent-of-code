@@ -5,7 +5,7 @@ import Data.List
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
-import Data.Text
+import Data.Text (Text, index, length)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -19,7 +19,7 @@ type Coord = (Int, Int)
 type Input = TreeMap
 
 type OutputA = Int
-type OutputB = Void
+type OutputB = Int
 
 ------------ PARSER ------------
 isMapSymbol :: Char -> Bool
@@ -48,16 +48,21 @@ countTrees c stepper p grid
   where
     finished = p c
 
-partA :: Input -> OutputA
-partA grid = countTrees start stepper finisher grid
+countForStep :: Coord -> TreeMap -> Int
+countForStep step grid = countTrees start stepper finisher grid
   where
     yLimit = Data.List.length grid
-    step = (3, 1)
     start = (0, 0)
     lim = (Data.Text.length $ Data.List.head grid, Data.List.length grid)
     stepper = calcStep step lim
     finisher = (>= yLimit) . snd
 
+partA :: Input -> OutputA
+partA = countForStep step
+  where
+    step = (3, 1)
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB grid = product $ map (`countForStep` grid) steps
+  where
+    steps = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
