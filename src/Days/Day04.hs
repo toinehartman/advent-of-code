@@ -14,25 +14,47 @@ import qualified Util.Util as U
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
+import Data.Char (isSpace)
+import Data.Text (Text)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
 runDay = R.runDay inputParser partA partB
 
+blankLine :: Parser ()
+blankLine = endOfLine *> endOfLine
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = passport `sepBy` blankLine
+
+key :: Parser Key
+key = do
+  k <- Data.Attoparsec.Text.take 3
+  skip (== ':')
+  v <- Data.Attoparsec.Text.takeTill isSpace
+  return k
+
+passport :: Parser Passport
+passport = key `sepBy` space
 
 ------------ TYPES ------------
-type Input = Void
+type Passport = [Key]
 
-type OutputA = Void
+type Key = Text
+
+type Input = [Passport]
+
+type OutputA = Int
 
 type OutputB = Void
 
+isValid :: Passport -> Bool
+isValid p = length p == 8 || length p == 7 && opt `notElem` p
+  where
+    opt = "cid"
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = length . filter isValid
 
 ------------ PART B ------------
 partB :: Input -> OutputB
