@@ -1,4 +1,4 @@
-module Util.Parsers (coordinateParser) where
+module Util.Parsers (coordinateParser, blankLine) where
 
 import Data.Attoparsec.Text
 import Data.Map (Map)
@@ -23,3 +23,6 @@ coordinateParser mapper start = coordinateParser' start start
           return Map.empty
         ]
     addToMap mapper x y c = Map.alter (const (mapper c)) (x, y)
+
+blankLine :: Parser ()
+blankLine = endOfLine >> endOfLine

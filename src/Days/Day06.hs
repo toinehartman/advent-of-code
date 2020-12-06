@@ -1,7 +1,7 @@
 module Days.Day06 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
+import Data.List (foldl')
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Maybe
@@ -14,6 +14,9 @@ import qualified Util.Util as U
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
+import Data.Char (isAlpha)
+import Data.Text (unpack)
+import Util.Parsers (blankLine)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,18 +24,33 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = group `sepBy` blankLine
 
+group :: Parser Group
+group = answers `sepBy` endOfLine
+
+answers :: Parser Answers
+answers = Set.fromList . unpack <$> Data.Attoparsec.Text.takeWhile1 isAlpha
+
+-- group :: Parser Group
+-- group = (Set.fromList . unpack <$> Data.Attoparsec.Text.takeWhile isAlpha) `sepBy` endOfLine
 ------------ TYPES ------------
-type Input = Void
+type Input = [Group]
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
+type Group = [Answers]
+
+type Answers = Set Char
 ------------ PART A ------------
+-- partA = id
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = sum . map countPerGroup
+  where
+    countPerGroup :: Group -> Int
+    countPerGroup g = length $ foldl' Set.union Set.empty g
 
 ------------ PART B ------------
 partB :: Input -> OutputB

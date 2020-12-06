@@ -18,13 +18,11 @@ import Data.Char (isSpace)
 import Control.Monad (liftM2)
 import Data.Functor (($>))
 import Data.Text (Text, pack, unpack)
+import Util.Parsers (blankLine)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
 runDay = R.runDay inputParser partA partB
-
-blankLine :: Parser ()
-blankLine = endOfLine *> endOfLine
 ------------ PARSER ------------
 inputParser :: Parser Input
 inputParser = passport `sepBy` blankLine
