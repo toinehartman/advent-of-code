@@ -31,9 +31,6 @@ group = answers `sepBy` endOfLine
 
 answers :: Parser Answers
 answers = Set.fromList . unpack <$> Data.Attoparsec.Text.takeWhile1 isAlpha
-
--- group :: Parser Group
--- group = (Set.fromList . unpack <$> Data.Attoparsec.Text.takeWhile isAlpha) `sepBy` endOfLine
 ------------ TYPES ------------
 type Input = [Group]
 
@@ -50,8 +47,11 @@ partA :: Input -> OutputA
 partA = sum . map countPerGroup
   where
     countPerGroup :: Group -> Int
-    countPerGroup g = length $ foldl' Set.union Set.empty g
+    countPerGroup = length . foldl' Set.union Set.empty
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = sum . map countPerGroup
+  where
+    countPerGroup :: Group -> Int
+    countPerGroup = length . foldl1 Set.intersection -- fold without base case
