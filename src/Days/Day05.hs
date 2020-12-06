@@ -30,7 +30,7 @@ type Input = [String]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 type RowRange = Range
 
@@ -50,23 +50,31 @@ upper (min, max) = (min + half, max)
     l = max - min + 1
     half = l `div` 2
 
-findSeat :: ColRange -> RowRange -> [Char] -> Int
-findSeat c r (d : ds)
-  | d == 'F' = findSeat c (lower r) ds
-  | d == 'B' = findSeat c (upper r) ds
-  | d == 'L' = findSeat (lower c) r ds
-  | d == 'R' = findSeat (upper c) r ds
+calcSeatID :: ColRange -> RowRange -> [Char] -> Int
+calcSeatID c r (d : ds)
+  | d == 'F' = calcSeatID c (lower r) ds
+  | d == 'B' = calcSeatID c (upper r) ds
+  | d == 'L' = calcSeatID (lower c) r ds
+  | d == 'R' = calcSeatID (upper c) r ds
   | otherwise = error "Strange character occurred..."
-findSeat (minC, c) (minR, r) ""
+calcSeatID (minC, c) (minR, r) ""
   | minC == c && minR == r = c + 8 * r
   | otherwise = error "Range did not converge"
------------- PART A ------------
-partA :: Input -> OutputA
-partA = maximum . map (findSeat colRange rowRange) . filter (not . null)
+
+seatIDs :: Input -> [Int]
+seatIDs = map (calcSeatID colRange rowRange) . filter (not . null)
   where
     colRange = (0, 7) :: ColRange
     rowRange = (0, 127) :: RowRange
+------------ PART A ------------
+partA :: Input -> OutputA
+partA = maximum . seatIDs
 
 ------------ PART B ------------
+findMissingSeat :: [Int] -> Int
+findMissingSeat (x1 : x2 : x3 : xs)
+  | x2 - 1 == x1 && x2 + 1 == x3 = findMissingSeat (x2 : x3 : xs)
+  | otherwise = x2 + 1
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = findMissingSeat . sort . seatIDs
