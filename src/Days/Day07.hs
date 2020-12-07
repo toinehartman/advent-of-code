@@ -9,10 +9,10 @@ import qualified Data.Set as Set
 
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
 import Data.Char (isPunctuation)
 import Data.Functor (($>))
 import Data.Text (unpack)
+import GHC.Base (liftM2)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -57,13 +57,13 @@ type Input = [Bag]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 type Color = String
 
 type Contents = Map Color Int
 
-data Bag = Bag Color Contents deriving (Show)
+data Bag = Bag Color Contents deriving (Show, Eq)
 
 ------------ PART A -----------
 containerMap :: [Bag] -> Map Color [Color]
@@ -88,5 +88,16 @@ partA = length . bfs bag . containerMap
     bag = ["shiny gold"]
 
 ------------ PART B ------------
+countBags :: Color -> [Bag] -> Int
+countBags c bs = sum $ map (liftM2 (+) snd $ \(k, a) -> a * countBags k bs) $ Map.toList bs'
+  where
+    lookup' c = head . filter (p c)
+    (Bag _ bs') = lookup' c bs
+
+col :: Bag -> Color
+col (Bag c _) = c
+
+p :: Color -> Bag -> Bool
+p c b = col b == c
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = countBags "shiny gold"
