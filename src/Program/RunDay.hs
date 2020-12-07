@@ -1,4 +1,4 @@
-module Program.RunDay (runDay) where
+module Program.RunDay (runDay, parseOnly) where
 
 import Control.Exception (SomeException, catch)
 import Control.Monad.Except
