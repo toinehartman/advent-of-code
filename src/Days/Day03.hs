@@ -4,15 +4,14 @@ module Days.Day03 (runDay) where
 import Data.List
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
-import Data.Text (Text, index, length)
+import Data.Text (unpack)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
 runDay = R.runDay inputParser partA partB
 
 ------------ TYPES ------------
-type TreeMap = [Text]
+type TreeMap = [String]
 
 type Coord = (Int, Int)
 
@@ -26,11 +25,11 @@ isMapSymbol :: Char -> Bool
 isMapSymbol c = (c == '.') || (c == '#')
 
 inputParser :: Parser Input
-inputParser = takeWhile1 isMapSymbol `sepBy` endOfLine
+inputParser = (unpack <$> takeWhile1 isMapSymbol) `sepBy` endOfLine
 
 ------------ PART A ------------
 loc :: Coord -> TreeMap -> Char
-loc (x, y) grid = row `index` x
+loc (x, y) grid = row !! x
   where
     row = grid !! y
 
@@ -53,7 +52,7 @@ countForStep step grid = countTrees start stepper finisher grid
   where
     yLimit = Data.List.length grid
     start = (0, 0)
-    lim = (Data.Text.length $ Data.List.head grid, Data.List.length grid)
+    lim = (length $ Data.List.head grid, Data.List.length grid)
     stepper = calcStep step lim
     finisher = (>= yLimit) . snd
 

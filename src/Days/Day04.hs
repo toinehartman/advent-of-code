@@ -1,24 +1,14 @@
 module Days.Day04 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
-
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
 import Data.Char (isSpace)
 import Control.Monad (liftM2)
 import Data.Functor (($>))
 import Data.Text (Text, pack, unpack)
 import Util.Parsers (blankLine)
+import Data.List (delete)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -34,23 +24,18 @@ entry = do
   value k
 
 value :: Text -> Parser Entry
-value "byr" = do BYr <$> decimal
-value "iyr" = do IYr <$> decimal
-value "eyr" = do EYr <$> decimal
+value "byr" = BYr <$> decimal
+value "iyr" = IYr <$> decimal
+value "eyr" = EYr <$> decimal
 value "hgt" = do
   d <- decimal
   unit <- takeTill isSpace
   return $ Hgt d (unpack unit)
-value "hcl" = do
-  c <- takeTill isSpace
-  return . HCl $ unpack c
-value "ecl" = do
-  c <- takeTill isSpace
-  return . ECl $ unpack c
-value "pid" = do
-  id <- takeTill isSpace
-  return . PID $ unpack id
+value "hcl" = HCl . unpack <$> takeTill isSpace
+value "ecl" = ECl . unpack <$> takeTill isSpace
+value "pid" = PID . unpack <$> takeTill isSpace
 value "cid" = do takeTill isSpace $> CID
+
 passport :: Parser Passport
 passport = entry `sepBy` space
 
@@ -76,11 +61,8 @@ type OutputB = Int
 
 ------------ PART A ------------
 isValidA :: Passport -> Bool
-isValidA p
-  | l == 7 = CID `notElem` p
-  | otherwise = l == 8
-  where
-    l = length p
+isValidA p = length (CID `delete` p) == 7
+
 partA :: Input -> OutputA
 partA = length . filter isValidA
 
@@ -107,5 +89,6 @@ isValidEntry (PID id)
     Left (_ :: String) -> False
 isValidEntry CID = True
 isValidEntry _ = False
+
 partB :: Input -> OutputB
 partB = length . filter (liftM2 (&&) isValidA isValidB)

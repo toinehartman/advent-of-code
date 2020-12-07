@@ -45,7 +45,7 @@ chunksOf n ls
 sublistsOfSize :: Int -> [a] -> [[a]]
 sublistsOfSize 0 _ = [[]]
 sublistsOfSize _ [] = []
-sublistsOfSize n l@(x : xs) = withHead ++ withoutHead
+sublistsOfSize n (x : xs) = withHead ++ withoutHead
   where
     withHead = map (x :) $ sublistsOfSize (n - 1) xs
     withoutHead = sublistsOfSize n xs
