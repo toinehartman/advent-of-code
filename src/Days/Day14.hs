@@ -16,6 +16,8 @@ import Data.Attoparsec.Text
 import Data.Void
 import Data.Text (unpack)
 import Data.Word (Word64)
+import Data.Bits (Bits (setBit))
+import Foreign (Bits (clearBit))
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -26,7 +28,7 @@ inputParser :: Parser Input
 inputParser = do
   msk <- mask
   endOfLine
-  mms <- mem `sepBy` endOfLine
+  mms <- Map.fromList <$> mem `sepBy` endOfLine
   return (Program msk mms)
 
 mask :: Parser Mask
@@ -44,31 +46,37 @@ chars = do
     f (i, '0') = Just (i, 0)
     f (i, '1') = Just (i, 1)
 
-mem :: Parser Mem
+mem :: Parser (Int, Value)
 mem = do
   string "mem["
   i <- decimal
   string "] = "
   v :: Word64 <- decimal
-  return (Mem i v)
+  return (i, v)
 
 ------------ TYPES ------------
 type Input = Program
 
-type OutputA = Int
+type OutputA = Word64
 
 type OutputB = Void
 
-data Program = Program Mask [Mem] deriving (Show)
+data Program = Program Mask Mem deriving (Show)
 
 type Mask = Map Int Int
 
-data Mem = Mem Int Value deriving (Show)
+type Mem = Map Int Value
 
 type Value = Word64
 ------------ PART A ------------
+masked :: Value -> Mask -> Value
+masked v msk = Map.foldlWithKey' aux v msk
+  where
+    aux :: Value -> Int -> Int -> Value
+    aux v i 0 = clearBit v i
+    aux v i 1 = setBit v i
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA (Program msk mem) = Map.foldl' (+) 0 (Map.map (`masked` msk) mem)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
