@@ -25,19 +25,22 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = do
-  msk <- mask
+inputParser = (programParser `sepBy` endOfLine) <* endOfInput
+
+programParser :: Parser Program
+programParser = do
+  msk <- maskParser
   endOfLine
-  mms <- Map.fromList <$> mem `sepBy` endOfLine
+  mms <- Map.fromList <$> memParser `sepBy` endOfLine
   return (Program msk mms)
 
-mask :: Parser Mask
-mask = do
+maskParser :: Parser Mask
+maskParser = do
   string "mask = "
-  Map.fromList <$> chars
+  Map.fromList <$> charsParser
 
-chars :: Parser [(Int, Int)]
-chars = do
+charsParser :: Parser [(Int, Int)]
+charsParser = do
   cs <- reverse . unpack <$> Data.Attoparsec.Text.take 36
   return $ mapMaybe f (zip [0 ..] cs)
   where
@@ -46,8 +49,8 @@ chars = do
     f (i, '0') = Just (i, 0)
     f (i, '1') = Just (i, 1)
 
-mem :: Parser (Int, Value)
-mem = do
+memParser :: Parser (Int, Value)
+memParser = do
   string "mem["
   i <- decimal
   string "] = "
@@ -55,7 +58,7 @@ mem = do
   return (i, v)
 
 ------------ TYPES ------------
-type Input = Program
+type Input = [Program]
 
 type OutputA = Word64
 
@@ -75,8 +78,13 @@ masked v msk = Map.foldlWithKey' aux v msk
     aux :: Value -> Int -> Int -> Value
     aux v i 0 = clearBit v i
     aux v i 1 = setBit v i
+maskProgram :: Program -> Mem
+maskProgram (Program msk mem) = Map.map (`masked` msk) mem
+
+combineMems :: [Mem] -> Mem
+combineMems = foldr1 Map.union
 partA :: Input -> OutputA
-partA (Program msk mem) = Map.foldl' (+) 0 (Map.map (`masked` msk) mem)
+partA = sum . Map.elems . combineMems . map maskProgram
 
 ------------ PART B ------------
 partB :: Input -> OutputB

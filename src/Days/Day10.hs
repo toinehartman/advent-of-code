@@ -4,7 +4,6 @@ module Days.Day10 (runDay) where
 import Data.List
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
 import qualified Data.IntMap as IntMap
 import Data.IntMap.Strict (IntMap, (!))
 {- ORMOLU_ENABLE -}
@@ -21,7 +20,7 @@ type Input = [Int]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 countJumps :: [Int] -> IntMap Int
 countJumps [_] = IntMap.fromAscList [(1, 0), (2, 0), (3, 1)]
@@ -36,5 +35,21 @@ partA ins = (counts ! 1) * (counts ! 3)
     counts = countJumps . sort $ 0 : ins
 
 ------------ PART B ------------
+countArrangements :: Int -> [Int] -> Int
+countArrangements jump [x1, _, x3]
+  | x1 + jump >= x3 = 2
+  | otherwise = 1
+countArrangements jump (x1 : x2 : x3 : x4 : xs)
+  | x1 + jump >= x4 = 4 * countArrangements jump (x4 : xs)
+  | x1 + jump >= x3 = 2 * countArrangements jump (x3 : x4 : xs)
+  | x1 + jump >= x2 = countArrangements jump (x2 : x3 : x4 : xs)
+  | otherwise = error "WTF?"
+countArrangements _ _ = 1
+
+-- countArrangements jump (x1 : x2 : x3 : x4 : xs)
+--   | x1 + jump == x2 = countArrangements jump (x2 : x3 : x4 : xs)
+--   | x1 + jump <= x3 = 1 + countArrangements jump (x3 : x4 : xs)
+--   | x1 + jump <= x4 = 3 + countArrangements jump (x4 : xs)
+--   | otherwise = error "WTF?"
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = countArrangements 3 . sort . (0 :)

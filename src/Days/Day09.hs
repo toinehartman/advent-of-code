@@ -6,7 +6,6 @@ import qualified Util.Util as U
 
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,7 +20,7 @@ type Input = [Int]
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 -- findCounterparts :: Int -> Int -> [Int] -> [Int]
 -- findCounterparts s x = filter (== s - x)
@@ -35,7 +34,7 @@ splice x y xs = zs
 -- `checkIfSum2 s xs` returns True if two different elements of xs sum to s
 checkIfSum2 :: (Int, [Int]) -> Maybe Int
 checkIfSum2 (s, xs) =
-  if any ((== s) . sum) $ U.sublistsOfSize 2 xs
+  if any ((== s) . sum) $ U.subsetsOfSize 2 xs
     then Nothing
     else Just s
 
@@ -46,5 +45,13 @@ partA ins = head $ mapMaybe (checkIfSum2 . (\i -> (ins !! (i + n), splice i (i +
     l = length ins
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+contiguousLists :: Int -> [Int] -> [[Int]]
+
+-- partB :: Input -> OutputB
+-- partB ins = filter ((== s) . sum) $ concatMap (`U.sublistsOfSize` ins) [2 .. l]
+partB ins = filter ((== s) . sum) $ concatMap (`U.subsetsOfSize` ins) [2 .. l]
+  where
+    -- s = 90433990
+    -- l = length ins
+    l = 3
+    s = 127

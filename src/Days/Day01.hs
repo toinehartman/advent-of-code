@@ -23,11 +23,11 @@ type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = product . sumsTo 2020 . U.sublistsOfSize 2
+partA = product . sumsTo 2020 . U.subsetsOfSize 2
 
-sumsTo :: (Num a, Eq a) => a -> [[a]] -> [a]
-sumsTo n = head . filter (\ys -> sum ys == n)
+sumsTo :: (Eq a, Foldable t, Num a) => a -> [t a] -> t a
+sumsTo n = head . filter ((== n) . sum)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = product . sumsTo 2020 . U.sublistsOfSize 3
+partB = product . sumsTo 2020 . U.subsetsOfSize 3

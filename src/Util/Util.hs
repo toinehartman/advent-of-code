@@ -9,6 +9,8 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
+import Data.IntSet (IntSet, singleton)
+import qualified Data.IntSet as IntSet
 {- ORMOLU_ENABLE -}
 
 {-
@@ -41,11 +43,11 @@ chunksOf n ls
   | length ls < n = [ls]
   | otherwise = (take n ls) : (chunksOf n (drop n ls))
 
---- Creates sublists of size x
-sublistsOfSize :: Int -> [a] -> [[a]]
-sublistsOfSize 0 _ = [[]]
-sublistsOfSize _ [] = []
-sublistsOfSize n (x : xs) = withHead ++ withoutHead
+--- Creates subsets of size x
+subsetsOfSize :: (Ord a) => Int -> [a] -> [Set a]
+subsetsOfSize 0 _ = [Set.empty]
+subsetsOfSize _ [] = []
+subsetsOfSize n (x : xs) = withHead ++ withoutHead
   where
-    withHead = map (x :) $ sublistsOfSize (n - 1) xs
-    withoutHead = sublistsOfSize n xs
+    withHead = map (x `Set.insert`) $ subsetsOfSize (n - 1) xs
+    withoutHead = subsetsOfSize n xs
