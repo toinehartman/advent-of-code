@@ -18,11 +18,16 @@ Input parseInput(str input) =
 int pairWiseDistance(list[int] left, list[int] right) =
     (0 | it + abs(l - r) | <l, r> <- zip2(left, right));
 
-int a(Input input) {
-    return pairWiseDistance(sort(input.left), sort(input.right));
+int similarity(list[int] left, list[int] right) {
+    rCount = distribution(right);
+    return (0 | it + l * (rCount[l] ? 0) | l <- left);
 }
 
-int b(Input input) = -1;
+int a(Input input) =
+    pairWiseDistance(sort(input.left), sort(input.right));
+
+int b(Input input) =
+    similarity(input.left, input.right);
 
 void main(bool example = false) {
     Input input = parseInput(readFile(getInput(1, example = example)));
