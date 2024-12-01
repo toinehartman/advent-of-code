@@ -1,6 +1,6 @@
 module days::Day1
 
-import Util;
+import util::Util;
 
 import IO;
 import List;
